@@ -1,3 +1,4 @@
+const { pipeline } = require("stream");
 const fs = require("node:fs/promises");
 //speed
 //space
@@ -54,7 +55,7 @@ const fs = require("node:fs/promises");
 
 (async () => {
   console.time("copy");
-  const srcFile = await fs.open("text-big.txt", "r");
+  const srcFile = await fs.open("text.txt", "r");
   // const srcFile = await fs.open("text-big.txt", "r");
 
   const destFile = await fs.open("text-copy.txt", "w");
@@ -65,11 +66,24 @@ const fs = require("node:fs/promises");
   // readStream.pipe(writeStream);
 
   // We use a Promise to wait for the pipe to finish
-  await new Promise((resolve, reject) => {
-    readStream.pipe(writeStream);
-    writeStream.on("finish", resolve);
-    writeStream.on("error", reject);
-  });
+  // await new Promise((resolve, reject) => {
+  //   readStream.pipe(writeStream);
+  //   writeStream.on("finish", resolve);
+  //   writeStream.on("error", reject);
+  // });
 
-  console.timeEnd("copy");
+  console.log(readStream.readableFlowing);
+
+  readStream.pipe(writeStream);
+
+  console.log(readStream.readableFlowing);
+
+  readStream.unpipe(writeStream);
+
+  readStream.pipe(writeStream);
+  console.log(readStream.readableFlowing);
+
+  readStream.on("end", () => {
+    console.timeEnd("copy");
+  });
 })();
